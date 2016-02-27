@@ -14,9 +14,12 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function(socket){
-    console.log('con');
-    socket.on('chat message', function(socket){
-        console.log('ring');
-        io.emit('chat message');
+    
+    socket.on('ring', function(user){
+        socket.broadcast.emit('ring', user);
+    });
+
+    socket.on('go', function(user){
+        socket.broadcast.emit('go', user);
     });
 });

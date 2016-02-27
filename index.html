@@ -3,86 +3,21 @@
 <head>
     <title>Shipping Address</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style type="text/css">
-        html, body {
-            height: 100%;
-            width: 100%;
-        }
-        body {
-        font-family: Arial,Helvetica,"Nimbus Sans L",sans-serif;
-        padding: 0 10px;
-        background-image: url(img/absurdidad.png);
-        color: #333;
-        margin: 0 auto;
-        font-size: 14px;
-        line-height: 21px;
-        text-align: center;
-        }
-
-        button {
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%);
-            height: 100px;
-            width: 100px;
-            border-radius: 50%;
-            -webkit-appearance: none;
-            border: none;
-            background-image: url(img/ring.png);
-            background-size: cover;
-            font-size: 0;
-            background-position: -1px 0px;
-        }
-</style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <button>Notify me!</button>
+    <div class="wrapper">
+        <button disabled="disabled">Notify me!</button>
+        <div class="form-row el-hidden">
+            <label for="user-name">I'm </label>
+            <span class="name-entred"></span>
+            <input type="text" id="user-name" class="user-name" />
+        </div>
+        <span class="el-hide msg-wait">Wait, <strong class="user-name-designate"></strong> open the door</span>
+    </div>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-
-        (function(win, doc){
-
-            var socket = io();
-
-            // request permission on page load
-            doc.addEventListener('DOMContentLoaded', function () {
-                if (Notification.permission !== "granted")
-                Notification.requestPermission();
-
-                doc.querySelector('button').addEventListener('click', function() {
-                    socket.emit('chat message');
-                })
-            });
-
-            function notifyMe() {
-                if (!Notification) {
-                    alert('Desktop notifications not available in your browser. Try Updating Chrome.');
-                    return;
-                }
-
-                if (Notification.permission !== "granted")
-                    Notification.requestPermission();
-                else {
-                    var notification = new Notification('Ring!', {
-                        icon: 'img/ring.png',
-                        body: "Hey there! Open the door!",
-                    });
-
-                    // notification.onclick = function () {
-                    //     window.open("http://stackoverflow.com/a/13328397/1269037");
-                    // };
-
-                }
-            }
-
-
-            socket.on('chat message', function(msg){
-                notifyMe();
-            });
-
-        })(window, window.document)
-    </script>
+    <script src="js/script.js"></script>
 
 </body>
 </html>

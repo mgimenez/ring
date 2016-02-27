@@ -1,0 +1,60 @@
+html, body {
+    height: 100%;
+    width: 100%;
+}
+body {
+    font-family: Arial,Helvetica,"Nimbus Sans L",sans-serif;
+    padding: 0 10px;
+    background-image: url(../assets/img/absurdidad.png);
+    color: #333;
+    margin: 0 auto;
+    font-size: 14px;
+    line-height: 21px;
+    text-align: center;
+}
+
+.wrapper {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+button {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    -webkit-appearance: none;
+    border: none;
+    background-image: url(../assets/img/ring.png);
+    background-size: cover;
+    font-size: 0;
+    background-position: -1px 0px;
+    margin-bottom: 10px;
+    outline: none;
+}
+
+button[disabled="disabled"] {
+    opacity: 0.7;
+}
+
+.form-row {
+    display: block;
+    margin: auto;
+}
+
+.user-name {
+    border: none;
+    border-bottom: solid 1px;
+    background: none;
+    outline: none;
+    background: none;
+    font-size: 14px;
+}
+
+.el-hide {
+    display: none;
+}
+
+.el-hidden {
+    visibility: hidden;
+}

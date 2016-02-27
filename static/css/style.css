@@ -26,9 +26,9 @@ button {
     -webkit-appearance: none;
     border: none;
     background-image: url(../assets/img/ring.png);
+    background-color: transparent;
     background-size: cover;
     font-size: 0;
-    background-position: -1px 0px;
     margin-bottom: 10px;
     outline: none;
 }

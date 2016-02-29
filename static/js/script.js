@@ -60,8 +60,13 @@
 
             userNameDesignate.innerHTML = userName;
             msgWait.classList.remove('el-hide');
-            
+
             btnRing.setAttribute('disabled', 'disabled');
+            
+            setTimeout(function (){
+                msgWait.classList.add('el-hide');
+                btnRing.removeAttribute('disabled');
+            }, 10000)
             
             if ("vibrate" in navigator) {
                 navigator.vibrate([500, 100, 500]);
@@ -70,6 +75,7 @@
                 icon: conf.iconRing,
                 body: userName
             });
+
             
         });
 

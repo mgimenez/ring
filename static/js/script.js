@@ -4,7 +4,8 @@
         audio = new Audio('assets/ring.mp3'),
         conf = {
             iconRing: 'assets/img/ring.png'
-        };
+        },
+        users = [];
 
     doc.addEventListener('DOMContentLoaded', function () {
 
@@ -32,8 +33,12 @@
                 this.classList.add('el-hide');
                 nameEntred.classList.remove('el-hide');
                 nameEntred.innerHTML = this.value;
+
+                socket.emit('add user', this.value);
+
                 localStorage.username = this.value;
                 this.blur();
+
             }
         });
 
@@ -62,12 +67,12 @@
             msgWait.classList.remove('el-hide');
 
             btnRing.setAttribute('disabled', 'disabled');
-            
+
             setTimeout(function (){
                 msgWait.classList.add('el-hide');
                 btnRing.removeAttribute('disabled');
             }, 10000)
-            
+
             if ("vibrate" in navigator) {
                 navigator.vibrate([500, 100, 500]);
             }
@@ -76,13 +81,32 @@
                 body: userName
             });
 
-            
+
+        });
+
+        socket.on('add user', function(data){
+            updateUserList(data.userList);
+
         });
 
         if (Notification.permission !== "granted")
         Notification.requestPermission();
 
     });
+
+    function updateUserList(userList) {
+    	var i = 0,
+    		total = userList.length,
+            list = '';
+
+		for (i; i < total; i++) {
+            list+= '<li>' + userList[i] + '</li>';
+		}
+
+        doc.querySelector('.list-user').innerHTML = list;
+		console.log(userList);
+    }
+
 
     function notifyMe(user) {
         if (!Notification) {
@@ -100,6 +124,7 @@
 
             notification.onclick = function () {
                 socket.emit('go', localStorage.username);
+                notification.close();
             };
 
         }

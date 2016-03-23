@@ -26,14 +26,16 @@ io.on('connection', function(socket){
     });
 
     socket.on('add user', function(username){
-
-        socket.username = username;
+        
         socket.userList = userList.push(username);
-        io.sockets.emit('add user', {
-            username: username,
+        io.sockets.emit('user added', {
             userList: userList
         });
     });
+
+    io.sockets.emit('connection', {
+        userList: userList
+    })
 
     socket.on('disconnect', function() {
         console.log('user disconnected');

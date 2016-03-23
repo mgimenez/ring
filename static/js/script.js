@@ -9,40 +9,32 @@
 
     doc.addEventListener('DOMContentLoaded', function () {
 
-        var btnRing = doc.querySelector('button'),
-            inputUser = doc.querySelector('.user-name'),
-            nameEntred = doc.querySelector('.name-entred'),
-            formRow = doc.querySelector('.form-row'),
-            msgWait = doc.querySelector('.msg-wait'),
-            userNameDesignate = doc.querySelector('.user-name-designate');
+        var btnRing = $('button'),
+            inputUser = $('.user-name'),
+            nameEntred = $('.name-entred'),
+            msgWait = $('.msg-wait'),
+            userNameDesignate = $('.user-name-designate');
 
         //Start user name
-        formRow.classList.remove('el-hidden');
+        $('.form-row').classList.remove('el-hidden');
 
-        if (localStorage.username) {
-            btnRing.removeAttribute('disabled');
-            inputUser.classList.add('el-hide');
-            nameEntred.classList.remove('el-hide');
-            nameEntred.innerHTML = localStorage.username;
-        }
+        if (localStorage.username) enableUser(localStorage.username);
 
         //Set user name
         inputUser.addEventListener('keypress', function(e) {
             if (e.which == 13 && this.value !== '') {
-                btnRing.removeAttribute('disabled');
-                this.classList.add('el-hide');
-                nameEntred.classList.remove('el-hide');
-                nameEntred.innerHTML = this.value;
+                
+                enableUser(this.value);
 
-                socket.emit('add user', this.value);
-
+                //Refresh username
                 localStorage.username = this.value;
+
                 this.blur();
 
             }
         });
 
-        //Enable input name
+        //Change user name
         nameEntred.addEventListener('click', function(e) {
             btnRing.setAttribute('disabled', 'disabled');
             inputUser.classList.remove('el-hide');
@@ -76,7 +68,7 @@
             if ("vibrate" in navigator) {
                 navigator.vibrate([500, 100, 500]);
             }
-            var voyN = new Notification('Go!', {
+            new Notification('Go!', {
                 icon: conf.iconRing,
                 body: userName
             });
@@ -84,9 +76,8 @@
 
         });
 
-        socket.on('add user', function(data){
+        socket.on('user added', function(data){
             updateUserList(data.userList);
-
         });
 
         if (Notification.permission !== "granted")
@@ -94,16 +85,30 @@
 
     });
 
+    function enableUser(username) {
+
+        var btnRing = $('button'),
+            inputUser = $('.user-name'),
+            nameEntred = $('.name-entred');
+
+        btnRing.removeAttribute('disabled');
+        inputUser.classList.add('el-hide');
+        nameEntred.classList.remove('el-hide');
+        nameEntred.innerHTML = username;
+        socket.emit('add user', nameEntred.innerHTML);
+
+    }
+
     function updateUserList(userList) {
-    	var i = 0,
-    		total = userList.length,
-            list = '';
+  //   	var i = 0,
+  //   		total = userList.length,
+  //           list = '';
 
-		for (i; i < total; i++) {
-            list+= '<li>' + userList[i] + '</li>';
-		}
+		// for (i; i < total; i++) {
+  //           list+= '<li>' + userList[i] + '</li>';
+		// }
 
-        doc.querySelector('.list-user').innerHTML = list;
+  //       $('.list-user').innerHTML = list;
 		console.log(userList);
     }
 
@@ -128,6 +133,10 @@
             };
 
         }
+    }
+    
+    function $(el) {
+        return doc.querySelector(el);
     }
 
 })(window, window.document)

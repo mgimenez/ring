@@ -18,33 +18,46 @@
         //Start user name
         $('.form-row').classList.remove('el-hidden');
 
-        if (localStorage.username) enableUser(localStorage.username);
+        if (localStorage.userName) validateUser(localStorage.userName);
 
         //Set user name
         inputUser.addEventListener('keypress', function(e) {
             if (e.which == 13 && this.value !== '') {
-                
-                enableUser(this.value);
-
-                //Refresh username
-                localStorage.username = this.value;
-
-                this.blur();
-
+                validateUser(this.value);
+                // this.blur();
             }
         });
 
         //Change user name
         nameEntred.addEventListener('click', function(e) {
-            btnRing.setAttribute('disabled', 'disabled');
-            inputUser.classList.remove('el-hide');
-            inputUser.focus();
-            this.classList.add('el-hide');
+            changeUserName();
         });
 
         //ring events
         btnRing.addEventListener('click', function() {
-            socket.emit('ring', localStorage.username);
+            socket.emit('ring', localStorage.userName);
+        });
+
+        socket.on('loginSuccess', function(data){
+            enableUser(data.userName);
+            socket.emit('add user', data.userName);
+        });
+
+
+        socket.on('loginError', function(data){
+            console.log('user no disponible', data.userName);
+            changeUserName();
+        });
+        
+        socket.on('login', function(data){
+            updateUserList(data.userList);
+            //Refresh username
+            localStorage.userName = data.userName;
+        });
+
+        // Whenever the server emits 'user joined', log it in the chat body
+        socket.on('user joined', function(data) {
+            updateUserList(data.userList);
         });
 
         socket.on('ring', function(msg){
@@ -76,7 +89,9 @@
 
         });
 
-        socket.on('user added', function(data){
+        // Whenever the server emits 'user left', log it in the chat body
+        socket.on('user left', function(data) {
+            console.log('user left', data.userList)
             updateUserList(data.userList);
         });
 
@@ -85,7 +100,24 @@
 
     });
 
-    function enableUser(username) {
+    function validateUser(userName) {
+        socket.emit('validate user', userName, localStorage.userName);
+    }
+
+    function changeUserName() {
+
+        var btnRing = $('button'),
+            inputUser = $('.user-name'),
+            nameEntred = $('.name-entred');
+
+        btnRing.setAttribute('disabled', 'disabled');
+        inputUser.classList.remove('el-hide');
+        inputUser.focus();
+        nameEntred.classList.add('el-hide');
+
+    }
+
+    function enableUser(userName) {
 
         var btnRing = $('button'),
             inputUser = $('.user-name'),
@@ -94,21 +126,21 @@
         btnRing.removeAttribute('disabled');
         inputUser.classList.add('el-hide');
         nameEntred.classList.remove('el-hide');
-        nameEntred.innerHTML = username;
-        socket.emit('add user', nameEntred.innerHTML);
+        nameEntred.innerHTML = userName;
+        console.log('enableUser');
 
     }
 
     function updateUserList(userList) {
-  //   	var i = 0,
-  //   		total = userList.length,
-  //           list = '';
+    	var i = 0,
+    		total = userList.length,
+            list = '';
 
-		// for (i; i < total; i++) {
-  //           list+= '<li>' + userList[i] + '</li>';
-		// }
+		for (i; i < total; i++) {
+            list+= '<li>' + userList[i] + '</li>';
+		}
 
-  //       $('.list-user').innerHTML = list;
+        $('.list-user').innerHTML = list;
 		console.log(userList);
     }
 
@@ -128,7 +160,7 @@
             });
 
             notification.onclick = function () {
-                socket.emit('go', localStorage.username);
+                socket.emit('go', localStorage.userName);
                 notification.close();
             };
 

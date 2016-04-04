@@ -19,7 +19,7 @@ app.get('/', function(req, res){
 io.on('connection', function(socket){
 
     var addedUser = false;
-    console.log('user connected', userList);
+    console.log('user connected');
 
     socket.on('ring', function(user){
         socket.broadcast.emit('ring', user);
@@ -29,15 +29,16 @@ io.on('connection', function(socket){
         socket.broadcast.emit('go', user);
     });
 
-    socket.on('validate user', function(userName, userNamePrev){
+    socket.on('validate user', function(userName, userNamePrev, action){
         var i = 0,
             total,
             loginError = false;
+
         // console.log(userList);
-        // if (userNamePrev && userNamePrev !== userName) removeFromArray(userList, userNamePrev);
+        if (userName === userNamePrev) removeFromArray(userList, userNamePrev);
         total = userList.length;
         for (i; i < total; i++) {
-            if (userName === userList[i] && userName !== userNamePrev) {
+            if (userName === userList[i]) {
                 loginError = true;
                 socket.emit('loginError', {
                     userName: userName
@@ -46,6 +47,7 @@ io.on('connection', function(socket){
         }
 
         if (!loginError) {
+            if (userNamePrev) removeFromArray(userList, userNamePrev);
             socket.emit('loginSuccess', {
                 userName: userName
             });
@@ -54,11 +56,11 @@ io.on('connection', function(socket){
     });
 
     socket.on('add user', function(userName) {
-        if (addedUser) return;
+        // if (addedUser) return;
 
         socket.userName = userName;
         socket.userList = userList.push(userName);
-        ++userCount; 
+        ++userCount;
         addedUser = true;
 
         socket.emit('login', {
@@ -66,8 +68,6 @@ io.on('connection', function(socket){
                 userName: userName,
                 userList: userList
         });
-
-        console.log(userList);
 
         // echo globally (all clients) that a person has connected
         socket.broadcast.emit('user joined', {
@@ -87,14 +87,11 @@ io.on('connection', function(socket){
 
             var i = 0,
                 total = userList.length;
-
             for (i; i < total; i++) {
                 if (userList[i] === socket.userName) {
                     userList.splice(i, 1);
                 }
             }
-
-            console.log(userList);
 
             // echo globally that this client has left
             socket.broadcast.emit('user left', {

@@ -39,25 +39,27 @@
         });
 
         socket.on('loginSuccess', function(data){
+            $('.user-name').classList.remove('error');
+            console.log('success', data.userName);
             enableUser(data.userName);
             socket.emit('add user', data.userName);
         });
 
 
         socket.on('loginError', function(data){
-            console.log('user no disponible', data.userName);
+            $('.user-name').classList.add('error');
             changeUserName();
         });
         
         socket.on('login', function(data){
-            updateUserList(data.userList);
+            updateUserList(data);
             //Refresh username
             localStorage.userName = data.userName;
         });
 
         // Whenever the server emits 'user joined', log it in the chat body
         socket.on('user joined', function(data) {
-            updateUserList(data.userList);
+            updateUserList(data);
         });
 
         socket.on('ring', function(msg){
@@ -92,7 +94,7 @@
         // Whenever the server emits 'user left', log it in the chat body
         socket.on('user left', function(data) {
             console.log('user left', data.userList)
-            updateUserList(data.userList);
+            updateUserList(data);
         });
 
         if (Notification.permission !== "granted")
@@ -131,8 +133,9 @@
 
     }
 
-    function updateUserList(userList) {
+    function updateUserList(data) {
     	var i = 0,
+            userList = data.userList,
     		total = userList.length,
             list = '';
 
@@ -141,6 +144,7 @@
 		}
 
         $('.list-user').innerHTML = list;
+        $('.user-count').innerHTML = data.userCount;
 		console.log(userList);
     }
 

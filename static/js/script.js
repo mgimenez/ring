@@ -5,7 +5,8 @@
         conf = {
             iconRing: 'assets/img/ring.png'
         },
-        users = [];
+        users = [],
+        ringer = false;
 
     doc.addEventListener('DOMContentLoaded', function () {
 
@@ -30,17 +31,18 @@
 
         //Change user name
         nameEntred.addEventListener('click', function(e) {
+            socket.emit('change userName', localStorage.userName);
             changeUserName();
         });
 
         //ring events
         btnRing.addEventListener('click', function() {
             socket.emit('ring', localStorage.userName);
+            ringer = true;
         });
 
         socket.on('loginSuccess', function(data){
             $('.user-name').classList.remove('error');
-            console.log('success', data.userName);
             enableUser(data.userName);
             socket.emit('add user', data.userName);
         });
@@ -57,6 +59,16 @@
             localStorage.userName = data.userName;
         });
 
+        socket.on('UserExistent', function(data){
+            alert('The session of Ring is open in another window. Use from there or close it to continue.');
+            localStorage.clear();
+            if (history.back() !== undefined) {
+              history.back();
+            } else {
+                document.location = 'http://google.com';
+            }
+        });
+
         // Whenever the server emits 'user joined', log it in the chat body
         socket.on('user joined', function(data) {
             updateUserList(data);
@@ -70,30 +82,32 @@
         //go events
         socket.on('go', function(userName){
 
-            userNameDesignate.innerHTML = userName;
-            msgWait.classList.remove('el-hide');
+            if (ringer) {
 
-            btnRing.setAttribute('disabled', 'disabled');
+                userNameDesignate.innerHTML = userName;
+                msgWait.classList.remove('el-hide');
+                btnRing.setAttribute('disabled', 'disabled');
+                setTimeout(function (){
+                    msgWait.classList.add('el-hide');
+                    btnRing.removeAttribute('disabled');
+                }, 10000)
+                if ("vibrate" in navigator) {
+                    navigator.vibrate([500, 100, 500]);
+                }
 
-            setTimeout(function (){
-                msgWait.classList.add('el-hide');
-                btnRing.removeAttribute('disabled');
-            }, 10000)
+            } else {
 
-            if ("vibrate" in navigator) {
-                navigator.vibrate([500, 100, 500]);
+                new Notification('Go!', {
+                    icon: conf.iconRing,
+                    body: userName
+                });
             }
-            new Notification('Go!', {
-                icon: conf.iconRing,
-                body: userName
-            });
 
 
         });
 
         // Whenever the server emits 'user left', log it in the chat body
         socket.on('user left', function(data) {
-            console.log('user left', data.userList)
             updateUserList(data);
         });
 
@@ -129,7 +143,6 @@
         inputUser.classList.add('el-hide');
         nameEntred.classList.remove('el-hide');
         nameEntred.innerHTML = userName;
-        console.log('enableUser');
 
     }
 
@@ -145,7 +158,6 @@
 
         $('.list-user').innerHTML = list;
         $('.user-count').innerHTML = data.userCount;
-		console.log(userList);
     }
 
 
@@ -160,7 +172,7 @@
         else {
             var notification = new Notification('Ring!', {
                 icon: conf.iconRing,
-                body: "Hey, I'm " + user + "! Open the door!",
+                body: "Hey, I'm " + user + "! Please, open the door!",
             });
 
             notification.onclick = function () {

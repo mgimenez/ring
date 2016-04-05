@@ -19,7 +19,6 @@ app.get('/', function(req, res){
 io.on('connection', function(socket){
 
     var addedUser = false;
-    console.log('user connected');
 
     socket.on('ring', function(user){
         socket.broadcast.emit('ring', user);
@@ -29,25 +28,31 @@ io.on('connection', function(socket){
         socket.broadcast.emit('go', user);
     });
 
+    socket.on('change userName', function(userName){
+        removeFromArray(userList, userName);
+    });
+
     socket.on('validate user', function(userName, userNamePrev, action){
         var i = 0,
-            total,
+            total = userList.length,
             loginError = false;
 
-        // console.log(userList);
-        if (userName === userNamePrev) removeFromArray(userList, userNamePrev);
-        total = userList.length;
         for (i; i < total; i++) {
             if (userName === userList[i]) {
                 loginError = true;
-                socket.emit('loginError', {
-                    userName: userName
-                });
+                if (userName === userNamePrev) {
+                    socket.emit('UserExistent', {
+                        userName: userName
+                    });
+                } else {
+                    socket.emit('loginError', {
+                        userName: userName
+                    });
+                }
             }
         }
 
         if (!loginError) {
-            if (userNamePrev) removeFromArray(userList, userNamePrev);
             socket.emit('loginSuccess', {
                 userName: userName
             });
@@ -56,11 +61,11 @@ io.on('connection', function(socket){
     });
 
     socket.on('add user', function(userName) {
-        // if (addedUser) return;
+        if (!addedUser) ++userCount;
 
         socket.userName = userName;
         socket.userList = userList.push(userName);
-        ++userCount;
+        
         addedUser = true;
 
         socket.emit('login', {
@@ -80,8 +85,7 @@ io.on('connection', function(socket){
 
 
     socket.on('disconnect', function() {
-
-        console.log('user disconnected');
+        
         if (addedUser) {
             --userCount;
 

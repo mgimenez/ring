@@ -4,10 +4,10 @@ html, body {
 }
 body {
     font-family: Arial,Helvetica,"Nimbus Sans L",sans-serif;
-    padding: 0 10px;
+    padding: 0;
+    margin: 0;
     background-image: url(../assets/img/absurdidad.png);
     color: #333;
-    margin: 0 auto;
     font-size: 14px;
     line-height: 21px;
     text-align: center;
@@ -57,4 +57,34 @@ button[disabled="disabled"] {
 
 .el-hidden {
     visibility: hidden;
+}
+.list-user {
+    padding: 0;
+    margin: 0 10px;
+}
+.list-user li {
+    text-align: left;
+    list-style: none;
+    padding: 5px;
+}
+.list-user li:nth-child(odd) {
+    background-color: #ccc;
+}
+
+.list-user li:nth-child(even) {
+    background-color: #ddd;
+}
+
+h5 {
+    text-align: left;
+    margin: 30px 10px 0;
+    font-weight: normal;
+    font-size: 13px;
+    color: #fff;
+    padding: 5px;
+    background: #333;
+}
+.error {
+    border-color: #F00;
+    color: #F00;
 }

@@ -167,40 +167,20 @@
             return;
         }
 
-        navigator.serviceWorker.register('sw.js');
-        Notification.requestPermission(function(result) {
-            if (result === 'granted') {
-                navigator.serviceWorker.ready.then(function(registration) {
-                    registration.showNotification('Notification with ServiceWorker');
+        if (Notification.permission !== "granted")
+            Notification.requestPermission();
+        else {
+            var notification = new Notification('Ring!', {
+                icon: conf.iconRing,
+                body: "Hey, I'm " + user + "! Please, open the door!",
+            });
 
-                    var notification = new Notification('Ring!', {
-                        icon: conf.iconRing,
-                        body: "Hey, I'm " + user + "! Please, open the door!",
-                    });
+            notification.onclick = function () {
+                socket.emit('go', localStorage.userName);
+                notification.close();
+            };
 
-                    notification.onclick = function () {
-                        socket.emit('go', localStorage.userName);
-                        notification.close();
-                    };
-                });
-            }
-        });
-
-
-        // if (Notification.permission !== "granted")
-        //     Notification.requestPermission();
-        // else {
-        //     var notification = new Notification('Ring!', {
-        //         icon: conf.iconRing,
-        //         body: "Hey, I'm " + user + "! Please, open the door!",
-        //     });
-
-        //     notification.onclick = function () {
-        //         socket.emit('go', localStorage.userName);
-        //         notification.close();
-        //     };
-
-        // }
+        }
     }
     
     function $(el) {

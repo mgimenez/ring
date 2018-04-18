@@ -9,4 +9,4 @@ Set your username and tap/click on Ring icon, all rest of users on the same netw
 
 When a user click on the notification, all rest of user revices the username who will open the door.
 
-[Demo](http://ringing.herokuapp.com)
+[Demo](https://ringing.herokuapp.com)
